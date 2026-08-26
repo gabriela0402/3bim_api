@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-@app.get('/produtos', response_model=list[PetResponse])
+@app.get('/produtos', response_model=list[ProdutoResponse])
 def listar_produtos(db: Session = Depends(get_db)):
     return db.query(ProdutoDB).all()
     
@@ -83,7 +83,7 @@ def obter_pet(pet_id: int, db: Session = Depends(get_db)):
 
 @app.delete('/pets/{pet_id}', status_code=204)
 def remover_pet(pet_id: int, db: Session = Depends(get_db)):
-    pet = db.query(PetDB).filter(ProdutoDB.id == pet_id).first()
+    pet = db.query(PetDB).filter(PetDB.id == pet_id).first() 
     if pet is None:
         raise HTTPException(status_code=404, detail='Pet não encontrado')
     db.delete(pet)
