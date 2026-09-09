@@ -1,14 +1,10 @@
-# main.py
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import ProdutoDB, PetDB
 from schemas import ProdutoCreate, ProdutoResponse, PetBase, PetResponse, PetCreate
-
 from fastapi.middleware.cors import CORSMiddleware
 
-
-# Base.metadata.create_all(bind=engine) # cria as tabelas, se ainda não existirem
 app = FastAPI()
 
 @app.on_event("startup")
@@ -18,7 +14,6 @@ def criar_tabelas():
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
-    # em produção, restringir para o domínio real do front-end
     allow_methods=['*'],
     allow_headers=['*'],
 )
@@ -54,8 +49,7 @@ def remover_produto(produto_id: int, db: Session = Depends(get_db)):
     db.commit()
 
 @app.put('/produtos/{produto_id}', response_model=ProdutoResponse)
-def atualizar_produto(produto_id: int, dados: ProdutoCreate, db:
-Session = Depends(get_db)):
+def atualizar_produto(produto_id: int, dados: ProdutoCreate, db: Session = Depends(get_db)):
     produto = buscar_produto(db, produto_id)
     if produto is None:
         raise HTTPException(status_code=404, detail='Produto não encontrado')
@@ -66,8 +60,7 @@ Session = Depends(get_db)):
     db.refresh(produto)
     return produto
 
-
-# Pet
+# Pets
 
 @app.get('/pets', response_model=list[PetResponse])
 def listar_pets(db: Session = Depends(get_db)):
@@ -97,8 +90,7 @@ def remover_pet(pet_id: int, db: Session = Depends(get_db)):
     db.commit()
 
 @app.put('/pets/{pet_id}', response_model=PetResponse)
-def atualizar_pet(pet_id: int, dados: PetCreate, db:
-Session = Depends(get_db)):
+def atualizar_pet(pet_id: int, dados: PetCreate, db: Session = Depends(get_db)):
     pet = db.query(PetDB).filter(PetDB.id == pet_id).first()
     if pet is None:
         raise HTTPException(status_code=404, detail='Pet não encontrado')
